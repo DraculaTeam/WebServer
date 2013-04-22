@@ -1,4 +1,4 @@
-./out
+dracula/out
 *.class
 *.iml
 .idea

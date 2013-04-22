@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<server-config>
+    <http>
+        <server>
+            <listen>9999</listen>
+            <root>./src/com/dracula/static</root>
+            <static-file-pattern>*.js, *.jpeg, *.gif, *.jpg, *.css</static-file-pattern>
+        </server>
+        <dynamic-proxy-pass>
+            <url-pattern>/forum</url-pattern>
+            <upstream-url>http://qaserver.com:8080</upstream-url>
+        </dynamic-proxy-pass>
+    </http>
+</server-config>
