@@ -12,9 +12,10 @@ import java.io.IOException;
 public class ConfigReader {
     private String filePath;
     Document document;
+
     public ConfigReader(String filePath) throws IOException, SAXException, ParserConfigurationException {
         this.filePath = filePath;
-        this.document=parseToDoc();
+        this.document = parseToDoc();
     }
 
     public int getPort() throws IOException, SAXException, ParserConfigurationException {
@@ -22,7 +23,7 @@ public class ConfigReader {
     }
 
     private Document parseToDoc() throws ParserConfigurationException, IOException, SAXException {
-        File file=new File(filePath);
+        File file = new File(filePath);
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         return builder.parse(file);
@@ -34,5 +35,9 @@ public class ConfigReader {
 
     public String getURL() {
         return document.getElementsByTagName("upstream-url").item(0).getTextContent();
+    }
+
+    public String getFileExtensions() {
+        return document.getElementsByTagName("static-file-pattern").item(0).getTextContent();
     }
 }

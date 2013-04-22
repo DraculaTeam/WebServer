@@ -25,12 +25,17 @@ public class ConfigReaderTest {
     }
 
     @Test
-    public void shouldReturnPathOfStaticFiles(){
+    public void shouldReturnPathOfStaticFiles() {
         assertThat(configReader.getStaticPath(), IsEqual.equalTo("./src/com/dracula/static"));
     }
 
     @Test
-    public void shouldReturnURLofExternalServer(){
-        assertThat(configReader.getURL(),IsEqual.equalTo("http://qaserver.com:8080"));
+    public void shouldReturnURLofExternalServer() {
+        assertThat(configReader.getURL(), IsEqual.equalTo("http://qaserver.com:8080"));
+    }
+
+    @Test
+    public void shouldReturnTheFileExtension() {
+        assertThat(configReader.getFileExtensions(), IsEqual.equalTo("*.js, *.jpeg, *.gif, *.jpg, *.css"));
     }
 }

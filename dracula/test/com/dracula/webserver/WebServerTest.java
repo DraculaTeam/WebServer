@@ -27,7 +27,6 @@ public class WebServerTest {
         Mockito.doNothing().when(mock).start();
         mock.start();
         Socket client = new Socket("localhost",9099);
-
         Mockito.verify(mock).start();
     }
 }
