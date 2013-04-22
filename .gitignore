@@ -1,8 +1,4 @@
-*.class
 ./out
-# Package Files #
-*.jar
-*.war
-*.ear
+*.class
 *.iml
 .idea
