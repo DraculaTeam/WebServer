@@ -7,7 +7,11 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertThat;
 
 public class ConfigReaderTest {
@@ -16,7 +20,7 @@ public class ConfigReaderTest {
 
     @Before
     public void setUp() throws ParserConfigurationException, SAXException, IOException {
-        configReader = new ConfigReader("./src/com/dracula/webserver/config.xml");
+        configReader = new ConfigReader("./test/com/dracula/webserver/config.xml");
     }
 
     @Test
@@ -36,6 +40,22 @@ public class ConfigReaderTest {
 
     @Test
     public void shouldReturnTheFileExtension() {
-        assertThat(configReader.getFileExtensions(), IsEqual.equalTo("*.js, *.jpeg, *.gif, *.jpg, *.css"));
+        assertTrue(matchElement());
+    }
+
+    private boolean matchElement() {
+        Boolean result = true;
+        List<String> expectedResult=new ArrayList<String>();
+        expectedResult.add("js");
+        expectedResult.add("jpeg");
+        int i = 0;
+        Iterator fileExtensions = configReader.getFileExtensions();
+
+        while(fileExtensions.hasNext()){
+            if(!fileExtensions.next().equals(expectedResult.get(i)))result = false;
+            i++;
+        }
+
+        return result;
     }
 }

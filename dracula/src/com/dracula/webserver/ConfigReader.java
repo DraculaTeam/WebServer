@@ -8,6 +8,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class ConfigReader {
     private String filePath;
@@ -37,7 +40,16 @@ public class ConfigReader {
         return document.getElementsByTagName("upstream-url").item(0).getTextContent();
     }
 
-    public String getFileExtensions() {
-        return document.getElementsByTagName("static-file-pattern").item(0).getTextContent();
+    public Iterator getFileExtensions() {
+        String extensions = document.getElementsByTagName("static-file-pattern").item(0).getTextContent();
+        extensions = extensions.replace("*.","");
+        String[] extensionArray = extensions.split(", ");
+        List extensionList = new ArrayList();
+
+        for (String extension : extensionArray) {
+            extensionList.add(extension);
+        }
+
+        return extensionList.iterator();
     }
 }
