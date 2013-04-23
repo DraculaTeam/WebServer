@@ -1,12 +1,15 @@
 package com.dracula.webserver;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import static org.junit.Assert.assertThat;
 
 public class WebServerTest {
 
@@ -16,7 +19,7 @@ public class WebServerTest {
         WebServer mock = Mockito.mock(WebServer.class);
         Mockito.doNothing().when(mock).start();
         mock.start();
-        Socket client = new Socket("localhost",8081);
+        Socket client = new Socket("localhost", 8081);
         Mockito.verify(mock).start();
     }
 
@@ -26,7 +29,13 @@ public class WebServerTest {
         WebServer mock = Mockito.mock(WebServer.class);
         Mockito.doNothing().when(mock).start();
         mock.start();
-        Socket client = new Socket("localhost",9099);
+        Socket client = new Socket("localhost", 9099);
         Mockito.verify(mock).start();
+    }
+
+    @Test
+    public void shouldGiveFilenameFromTheGivenUrl() throws IOException {
+        WebServer server = new WebServer(new ServerSocket(8051));
+        assertThat(server.getFileName("forum/activityWall.html"), IsEqual.equalTo("activityWall.html"));
     }
 }

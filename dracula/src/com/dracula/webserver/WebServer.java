@@ -3,9 +3,7 @@ package com.dracula.webserver;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Iterator;
@@ -27,8 +25,31 @@ public class WebServer{
         ConfigReader configReader = new ConfigReader(configFile);
         String url = getUrl();
         if(isExtensionPresent(configReader, url)){
-            System.out.println("present");
+            String filePath = configReader.getStaticPath() + getFileName(url);
+
+            try{
+                sendResponse(filePath);
+            } catch (FileNotFoundException e){
+                sendResponse("./src/com/dracula/static/fileNotFound.html");
+            }
         }
+    }
+
+    private void sendResponse(String filePath) throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+
+        byte[] buffer = new byte[1024];
+        int bytes = 0;
+
+        while((bytes = fileInputStream.read(buffer)) != -1 ){
+            dataOutputStream.write(buffer, 0, bytes);
+        }
+    }
+
+    String getFileName(String url) {
+        int beginIndex = url.lastIndexOf("/") + 1;
+        return url.substring(beginIndex);
     }
 
     private String getUrl() throws IOException {

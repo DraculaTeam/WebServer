@@ -3,7 +3,7 @@
     <http>
         <server>
             <listen>9999</listen>
-            <root>./src/com/dracula/static</root>
+            <root>./src/com/dracula/static/</root>
             <static-file-pattern>*.js, *.jpeg, *.gif, *.jpg, *.css, *.html</static-file-pattern>
         </server>
         <dynamic-proxy-pass>
