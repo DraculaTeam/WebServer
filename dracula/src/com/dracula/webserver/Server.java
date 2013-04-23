@@ -12,7 +12,9 @@ public class Server {
         ConfigReader configReader = new ConfigReader(filePath);
         ServerSocket socket = new ServerSocket(configReader.getPort());
         WebServer server = new WebServer(socket);
-        server.start();
-        server.handleRequest(filePath);
+        while(true){
+            server.connect();
+            server.handleRequest(filePath);
+        }
     }
 }

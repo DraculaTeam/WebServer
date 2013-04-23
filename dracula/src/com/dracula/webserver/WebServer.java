@@ -17,7 +17,7 @@ public class WebServer{
         this.serverSocket = socket;
     }
 
-    public void start() throws IOException {
+    public void connect() throws IOException, ParserConfigurationException, SAXException {
         socket = serverSocket.accept();
     }
 
@@ -33,6 +33,7 @@ public class WebServer{
                 sendResponse("./src/com/dracula/static/fileNotFound.html");
             }
         }
+        socket.close();
     }
 
     private void sendResponse(String filePath) throws IOException {
