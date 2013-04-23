@@ -11,10 +11,10 @@ public class Server {
         String filePath = "./src/com/dracula/webserver/config.xml";
         ConfigReader configReader = new ConfigReader(filePath);
         ServerSocket socket = new ServerSocket(configReader.getPort());
-        WebServer server = new WebServer(socket);
         while(true){
+            WebServer server = new WebServer(socket);
             server.connect();
-            server.handleRequest(filePath);
+            new Thread(server).start();
         }
     }
 }

@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
-public class WebServer {
+public class WebServer implements Runnable{
     private ServerSocket serverSocket;
     private Socket socket;
 
@@ -23,6 +23,7 @@ public class WebServer {
 
     public void handleRequest(String configFile) throws IOException, ParserConfigurationException, SAXException {
         ConfigReader configReader = new ConfigReader(configFile);
+
         String url = getUrl();
 
         if (isStatic(configReader, url)) {
@@ -88,5 +89,18 @@ public class WebServer {
         }
 
         return result;
+    }
+
+    @Override
+    public void run(){
+        try {
+            handleRequest("./src/com/dracula/webserver/config.xml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
     }
 }
