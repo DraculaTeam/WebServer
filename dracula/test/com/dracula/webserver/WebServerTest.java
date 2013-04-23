@@ -1,17 +1,15 @@
 package com.dracula.webserver;
 
-import org.hamcrest.core.IsEqual;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.powermock.api.easymock.PowerMock;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.ConnectException;
-
-import static org.junit.Assert.assertThat;
 
 public class WebServerTest {
 
@@ -35,9 +33,10 @@ public class WebServerTest {
         Mockito.verify(mock).connect();
     }
 
-    @Test
-    public void shouldGiveFilenameFromTheGivenUrl() throws IOException {
-        WebServer server = new WebServer(new ServerSocket(8051));
-        assertThat(server.getFileName("forum/activityWall.html"), IsEqual.equalTo("activityWall.html"));
+    @Test(expected = IOException.class)
+    public void shouldReturnIOException() throws Exception {
+        WebServer server = PowerMock.createPartialMock(WebServer.class,"handleRequest");
+        PowerMock.expectPrivate(server,"handleRequest","./src/com/dracula/webserver/wrong.xml").andThrow(new IOException());
+        new Thread(server).start();
     }
 }

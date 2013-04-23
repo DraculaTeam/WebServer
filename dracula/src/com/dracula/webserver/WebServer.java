@@ -21,7 +21,7 @@ public class WebServer implements Runnable{
         socket = serverSocket.accept();
     }
 
-    public void handleRequest(String configFile) throws IOException, ParserConfigurationException, SAXException {
+    private void handleRequest(String configFile) throws IOException, ParserConfigurationException, SAXException {
         ConfigReader configReader = new ConfigReader(configFile);
 
         String url = getUrl();
