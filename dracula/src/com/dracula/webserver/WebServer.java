@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
-public class WebServer{
+public class WebServer {
     private ServerSocket serverSocket;
     private Socket socket;
 
@@ -24,16 +24,34 @@ public class WebServer{
     public void handleRequest(String configFile) throws IOException, ParserConfigurationException, SAXException {
         ConfigReader configReader = new ConfigReader(configFile);
         String url = getUrl();
-        if(isExtensionPresent(configReader, url)){
+
+        if (isStatic(configReader, url)) {
+            handleStaticRequest(configReader, url);
+        } else {
+            handleDynamicRequest(configReader, url);
+        }
+
+        socket.close();
+    }
+
+    private void handleDynamicRequest(ConfigReader configReader, String url) throws IOException {
+
+    }
+
+    private boolean isStatic(ConfigReader configReader, String url) {
+        return url.contains(configReader.getUrlPattern(PatternType.STATIC));
+    }
+
+    private void handleStaticRequest(ConfigReader configReader, String url) throws IOException, SAXException, ParserConfigurationException {
+        if (isExtensionPresent(configReader, url)) {
             String filePath = configReader.getStaticPath() + getFileName(url);
 
-            try{
+            try {
                 sendResponse(filePath);
-            } catch (FileNotFoundException e){
+            } catch (FileNotFoundException e) {
                 sendResponse("./src/com/dracula/static/fileNotFound.html");
             }
         }
-        socket.close();
     }
 
     private void sendResponse(String filePath) throws IOException {
@@ -43,7 +61,7 @@ public class WebServer{
         byte[] buffer = new byte[1024];
         int bytes = 0;
 
-        while((bytes = fileInputStream.read(buffer)) != -1 ){
+        while ((bytes = fileInputStream.read(buffer)) != -1) {
             dataOutputStream.write(buffer, 0, bytes);
         }
     }
@@ -64,9 +82,9 @@ public class WebServer{
         Boolean result = false;
         Iterator fileExtensions = configReader.getFileExtensions();
 
-        while(fileExtensions.hasNext()){
-            String extension= (String) fileExtensions.next();
-            if(url.endsWith(extension)) result = true;
+        while (fileExtensions.hasNext()) {
+            String extension = (String) fileExtensions.next();
+            if (url.endsWith(extension)) result = true;
         }
 
         return result;

@@ -36,7 +36,7 @@ public class ConfigReader {
         return document.getElementsByTagName("root").item(0).getTextContent();
     }
 
-    public String getURL() {
+    public String getServerAddress() {
         return document.getElementsByTagName("upstream-url").item(0).getTextContent();
     }
 
@@ -51,5 +51,16 @@ public class ConfigReader {
         }
 
         return extensionList.iterator();
+    }
+
+    public String getUrlPattern(PatternType type) {
+        String staticPattern = document.getElementsByTagName("url-pattern").item(0).getTextContent();
+        String dynamicPattern = document.getElementsByTagName("url-pattern").item(1).getTextContent();
+
+        return type == PatternType.STATIC ? staticPattern : dynamicPattern;
+    }
+
+    public int getDynamicServerPort() {
+        return Integer.parseInt(document.getElementsByTagName("port").item(0).getTextContent());
     }
 }

@@ -3,12 +3,14 @@
     <http>
         <server>
             <listen>9999</listen>
+            <url-pattern>/forum/static/</url-pattern>
             <root>./src/com/dracula/static/</root>
             <static-file-pattern>*.js, *.jpeg, *.gif, *.jpg, *.css, *.html</static-file-pattern>
         </server>
         <dynamic-proxy-pass>
             <url-pattern>/forum</url-pattern>
-            <upstream-url>http://qaserver.com:8080</upstream-url>
+            <upstream-url>10.10.5.126</upstream-url>
+            <port>8080</port>
         </dynamic-proxy-pass>
     </http>
 </server-config>

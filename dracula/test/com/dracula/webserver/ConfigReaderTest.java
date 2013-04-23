@@ -20,7 +20,7 @@ public class ConfigReaderTest {
 
     @Before
     public void setUp() throws ParserConfigurationException, SAXException, IOException {
-        configReader = new ConfigReader("./test/com/dracula/webserver/config.xml");
+        configReader = new ConfigReader("./test/com/dracula/webserver/testConfig.xml");
     }
 
     @Test
@@ -30,17 +30,32 @@ public class ConfigReaderTest {
 
     @Test
     public void shouldReturnPathOfStaticFiles() {
-        assertThat(configReader.getStaticPath(), IsEqual.equalTo("./src/com/dracula/static"));
+        assertThat(configReader.getStaticPath(), IsEqual.equalTo("./src/com/dracula/static/"));
     }
 
     @Test
     public void shouldReturnURLofExternalServer() {
-        assertThat(configReader.getURL(), IsEqual.equalTo("http://qaserver.com:8080"));
+        assertThat(configReader.getServerAddress(), IsEqual.equalTo("http://10.10.5.126"));
     }
 
     @Test
     public void shouldReturnTheFileExtension() {
         assertTrue(matchElement());
+    }
+
+    @Test
+    public void shouldGiveUrlPatternForStaticRequest(){
+        assertThat(configReader.getUrlPattern(PatternType.STATIC), IsEqual.equalTo("/forum/static/"));
+    }
+
+    @Test
+    public void shouldGivePortOfDynamicProxyWebServer(){
+        assertThat(configReader.getDynamicServerPort(), IsEqual.equalTo(8080));
+    }
+
+    @Test
+    public void shouldGiveUrlPatternForDynamicRequest(){
+        assertThat(configReader.getUrlPattern(PatternType.REVERSE_PROXY), IsEqual.equalTo("/forum/"));
     }
 
     private boolean matchElement() {
