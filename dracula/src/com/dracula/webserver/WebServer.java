@@ -9,41 +9,41 @@ import java.net.Socket;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
-public class WebServer implements Runnable{
+public class WebServer{
     private ServerSocket serverSocket;
     private Socket socket;
+    private ConfigReader configReader;
 
-    public WebServer(ServerSocket socket) {
+    public WebServer(ServerSocket socket, String configFile) throws ParserConfigurationException, SAXException, IOException {
         this.serverSocket = socket;
+        this.configReader = new ConfigReader(configFile);
     }
 
     public void connect() throws IOException, ParserConfigurationException, SAXException {
         socket = serverSocket.accept();
     }
 
-    private void handleRequest(String configFile) throws IOException, ParserConfigurationException, SAXException {
-        ConfigReader configReader = new ConfigReader(configFile);
-        configReader.createDocumentObject();
+    public void handleRequest() throws IOException, ParserConfigurationException, SAXException {
         String url = getUrl();
-
-        if (isStatic(configReader, url)) {
-            handleStaticRequest(configReader, url);
+        if (isStatic(url)) {
+            handleStaticRequest(url);
         } else {
-            handleDynamicRequest(configReader, url);
+            handleDynamicRequest( url);
         }
+
         socket.close();
     }
 
-    private void handleDynamicRequest(ConfigReader configReader, String url) throws IOException {
+    private void handleDynamicRequest(String url) throws IOException {
 
     }
 
-    private boolean isStatic(ConfigReader configReader, String url) {
+    private boolean isStatic(String url) throws ParserConfigurationException, SAXException, IOException {
         return url.contains(configReader.getUrlPattern(PatternType.STATIC));
     }
 
-    private void handleStaticRequest(ConfigReader configReader, String url) throws IOException, SAXException, ParserConfigurationException {
-        if (isExtensionPresent(configReader, url)) {
+    private void handleStaticRequest(String url) throws IOException, SAXException, ParserConfigurationException {
+        if (isExtensionPresent(url)) {
             String filePath = configReader.getStaticPath() + getFileName(url);
 
             try {
@@ -78,7 +78,7 @@ public class WebServer implements Runnable{
         return stringTokenizer.nextToken();
     }
 
-    private boolean isExtensionPresent(ConfigReader configReader, String url) throws IOException, SAXException, ParserConfigurationException {
+    private boolean isExtensionPresent(String url) throws IOException, SAXException, ParserConfigurationException {
         Boolean result = false;
         Iterator fileExtensions = configReader.getFileExtensions();
 
@@ -86,19 +86,7 @@ public class WebServer implements Runnable{
             String extension = (String) fileExtensions.next();
             if (url.endsWith(extension)) result = true;
         }
-        return result;
-    }
 
-    @Override
-    public void run(){
-        try {
-            handleRequest("./src/com/dracula/webserver/config.xml");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        }
+        return result;
     }
 }

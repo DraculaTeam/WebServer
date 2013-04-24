@@ -9,12 +9,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 public class ConfigReader {
     private String filePath;
-    Document document;
+    private Document document;
 
     public ConfigReader(String filePath) throws IOException, SAXException, ParserConfigurationException {
         this.filePath = filePath;
@@ -43,20 +44,19 @@ public class ConfigReader {
         return document.getElementsByTagName("upstream-url").item(0).getTextContent();
     }
 
-    public Iterator getFileExtensions() {
+    public Iterator<String> getFileExtensions() {
         String extensions = document.getElementsByTagName("static-file-pattern").item(0).getTextContent();
-        extensions = extensions.replace("*.","");
+        extensions = extensions.replace("*.", "");
         String[] extensionArray = extensions.split(", ");
-        List extensionList = new ArrayList();
+        List<String> extensionList = new ArrayList<String>();
 
-        for (String extension : extensionArray) {
-            extensionList.add(extension);
-        }
+        Collections.addAll(extensionList, extensionArray);
 
         return extensionList.iterator();
     }
 
-    public String getUrlPattern(PatternType type) {
+    public String getUrlPattern(PatternType type) throws IOException, SAXException, ParserConfigurationException {
+        createDocumentObject();
         String staticPattern = document.getElementsByTagName("url-pattern").item(0).getTextContent();
         String dynamicPattern = document.getElementsByTagName("url-pattern").item(1).getTextContent();
 

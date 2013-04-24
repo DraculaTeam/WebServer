@@ -61,15 +61,15 @@ public class ConfigReaderTest {
 
     private boolean matchElement() throws IOException, SAXException, ParserConfigurationException {
         Boolean result = true;
-       
-        List<String> expectedResult=new ArrayList<String>();
+
+        List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("js");
         expectedResult.add("jpeg");
         int i = 0;
         Iterator fileExtensions = configReader.getFileExtensions();
 
-        while(fileExtensions.hasNext()){
-            if(!fileExtensions.next().equals(expectedResult.get(i)))result = false;
+        while (fileExtensions.hasNext()) {
+            if (!fileExtensions.next().equals(expectedResult.get(i))) result = false;
             i++;
         }
 
