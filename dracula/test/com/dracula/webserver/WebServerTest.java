@@ -30,7 +30,7 @@ public class WebServerTest {
         Mockito.doNothing().when(mock).connect();
         mock.connect();
         Socket client = new Socket("localhost", 9099);
-        Mockito.verify(mock).connect();
+        Mockito.verify(mock).connect() ;
     }
 
     @Test(expected = IOException.class)
