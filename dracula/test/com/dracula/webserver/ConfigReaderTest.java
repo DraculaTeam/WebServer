@@ -21,6 +21,7 @@ public class ConfigReaderTest {
     @Before
     public void setUp() throws ParserConfigurationException, SAXException, IOException {
         configReader = new ConfigReader("./test/com/dracula/webserver/testConfig.xml");
+        configReader.createDocumentObject();
     }
 
     @Test
@@ -29,37 +30,38 @@ public class ConfigReaderTest {
     }
 
     @Test
-    public void shouldReturnPathOfStaticFiles() {
+    public void shouldReturnPathOfStaticFiles() throws IOException, SAXException, ParserConfigurationException {
         assertThat(configReader.getStaticPath(), IsEqual.equalTo("./src/com/dracula/static/"));
     }
 
     @Test
-    public void shouldReturnURLofExternalServer() {
+    public void shouldReturnURLofExternalServer() throws IOException, SAXException, ParserConfigurationException {
         assertThat(configReader.getServerAddress(), IsEqual.equalTo("http://10.10.5.126"));
     }
 
     @Test
-    public void shouldReturnTheFileExtension() {
+    public void shouldReturnTheFileExtension() throws ParserConfigurationException, SAXException, IOException {
         assertTrue(matchElement());
     }
 
     @Test
-    public void shouldGiveUrlPatternForStaticRequest(){
+    public void shouldGiveUrlPatternForStaticRequest() throws IOException, SAXException, ParserConfigurationException {
         assertThat(configReader.getUrlPattern(PatternType.STATIC), IsEqual.equalTo("/forum/static/"));
     }
 
     @Test
-    public void shouldGivePortOfDynamicProxyWebServer(){
+    public void shouldGivePortOfDynamicProxyWebServer() throws IOException, SAXException, ParserConfigurationException {
         assertThat(configReader.getDynamicServerPort(), IsEqual.equalTo(8080));
     }
 
     @Test
-    public void shouldGiveUrlPatternForDynamicRequest(){
+    public void shouldGiveUrlPatternForDynamicRequest() throws IOException, SAXException, ParserConfigurationException {
         assertThat(configReader.getUrlPattern(PatternType.REVERSE_PROXY), IsEqual.equalTo("/forum/"));
     }
 
-    private boolean matchElement() {
+    private boolean matchElement() throws IOException, SAXException, ParserConfigurationException {
         Boolean result = true;
+       
         List<String> expectedResult=new ArrayList<String>();
         expectedResult.add("js");
         expectedResult.add("jpeg");

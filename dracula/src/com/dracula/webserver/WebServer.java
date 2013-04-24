@@ -23,7 +23,7 @@ public class WebServer implements Runnable{
 
     private void handleRequest(String configFile) throws IOException, ParserConfigurationException, SAXException {
         ConfigReader configReader = new ConfigReader(configFile);
-
+        configReader.createDocumentObject();
         String url = getUrl();
 
         if (isStatic(configReader, url)) {
@@ -31,7 +31,6 @@ public class WebServer implements Runnable{
         } else {
             handleDynamicRequest(configReader, url);
         }
-
         socket.close();
     }
 
@@ -87,7 +86,6 @@ public class WebServer implements Runnable{
             String extension = (String) fileExtensions.next();
             if (url.endsWith(extension)) result = true;
         }
-
         return result;
     }
 

@@ -39,4 +39,9 @@ public class WebServerTest {
         PowerMock.expectPrivate(server,"handleRequest","./src/com/dracula/webserver/wrong.xml").andThrow(new IOException());
         new Thread(server).start();
     }
+
+    @Test(expected = SAXException.class)
+    public void shouldThrowSAXException() throws Exception {
+
+    }
 }

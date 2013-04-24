@@ -18,6 +18,9 @@ public class ConfigReader {
 
     public ConfigReader(String filePath) throws IOException, SAXException, ParserConfigurationException {
         this.filePath = filePath;
+    }
+
+    public void createDocumentObject() throws ParserConfigurationException, IOException, SAXException {
         this.document = parseToDoc();
     }
 
