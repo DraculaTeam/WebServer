@@ -15,8 +15,8 @@ public class WebServer {
     private ServerSocket serverSocket;
     private Socket socket;
     private ConfigReader configReader;
-    private BufferedReader requestHeader;
     private String requestMethod;
+    private BufferedReader requestHeader;
 
     public WebServer(ServerSocket socket, String configFile) throws ParserConfigurationException, SAXException, IOException {
         this.serverSocket = socket;
@@ -40,18 +40,32 @@ public class WebServer {
     }
 
     private void handleDynamicRequest(String url) throws IOException {
+        URL dynamicUrl = new URL("http://" + configReader.getServerAddress() + ":" + configReader.getDynamicServerPort() + url);
+        HttpURLConnection connection = (HttpURLConnection) dynamicUrl.openConnection();
+        connection.setRequestMethod(requestMethod);
+        connection.connect();
+
         try {
-            URL dynamicUrl = new URL("http://" + configReader.getServerAddress() + ":" + configReader.getDynamicServerPort() + url);
-            HttpURLConnection connection = (HttpURLConnection) dynamicUrl.openConnection();
-            connection.setRequestMethod(requestMethod);
-            connection.connect();
+            passExternalServerResponse(connection);
 
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            writeResponse(new PrintWriter(socket.getOutputStream()), bufferedReader);
         } catch (Exception e) {
-
+            e.getCause();
         }
 
+    }
+
+    private void passExternalServerResponse(HttpURLConnection connection) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+        String line;
+        StringBuilder builder = new StringBuilder();
+        while ((line = bufferedReader.readLine()) != null) {
+            builder.append(line);
+        }
+
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+        printWriter.print(builder.toString());
+        printWriter.flush();
     }
 
     private boolean isStatic(String url) throws ParserConfigurationException, SAXException, IOException {
@@ -67,27 +81,24 @@ public class WebServer {
             } catch (FileNotFoundException e) {
                 sendResponse("./src/com/dracula/static/fileNotFound.html");
             }
+        } else {
+            sendResponse("./src/com/dracula/static/fileNotFound.html");
         }
     }
 
     private void sendResponse(String file) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream(file);
         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
-        PrintWriter printWriter = new PrintWriter(dataOutputStream);
-        writeResponse(printWriter, bufferedReader);
+        FileInputStream fileInputStream = new FileInputStream(file);
+        writeResponse(dataOutputStream, fileInputStream);
     }
 
-    private void writeResponse(PrintWriter printWriter, BufferedReader bufferedReader) throws IOException {
-        String line;
-        StringBuilder builder = new StringBuilder();
+    private void writeResponse(DataOutputStream dataOutputStream, FileInputStream fileInputStream) throws IOException {
+        byte[] buffer = new byte[1024];
+        int bytes = 0;
 
-        while ((line = bufferedReader.readLine()) != null) {
-                builder.append(line);
+        while ((bytes = fileInputStream.read(buffer)) != -1) {
+            dataOutputStream.write(buffer, 0, bytes);
         }
-
-        printWriter.print(builder.toString());
-        printWriter.flush();
     }
 
     String getFileName(String url) {
@@ -97,15 +108,13 @@ public class WebServer {
 
     private String getUrl() throws IOException {
         requestHeader = getRequestHeader();
-
         StringTokenizer stringTokenizer = new StringTokenizer(requestHeader.readLine());
-
         requestMethod = stringTokenizer.nextToken();
         return stringTokenizer.nextToken();
     }
 
     private BufferedReader getRequestHeader() throws IOException {
-        return new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        return new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF8"));
     }
 
     private boolean isExtensionPresent(String url) throws IOException, SAXException, ParserConfigurationException {
