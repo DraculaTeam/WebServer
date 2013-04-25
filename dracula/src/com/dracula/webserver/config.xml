@@ -3,7 +3,7 @@
     <http>
         <server>
             <listen>9999</listen>
-            <url-pattern>/forum/static/</url-pattern>
+            <url-pattern>/dracula/forum/static/</url-pattern>
             <root>./src/com/dracula/static/</root>
             <static-file-pattern>*.js, *.jpeg, *.gif, *.jpg, *.css, *.html</static-file-pattern>
         </server>

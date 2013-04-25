@@ -16,6 +16,7 @@ public class WebServer {
     private Socket socket;
     private ConfigReader configReader;
     private BufferedReader requestHeader;
+    private String requestMethod;
 
     public WebServer(ServerSocket socket, String configFile) throws ParserConfigurationException, SAXException, IOException {
         this.serverSocket = socket;
@@ -39,21 +40,17 @@ public class WebServer {
     }
 
     private void handleDynamicRequest(String url) throws IOException {
-        Socket externalServerSocket = new Socket(configReader.getServerAddress(), configReader.getDynamicServerPort());
-        System.out.println(externalServerSocket.getRemoteSocketAddress());
+        try {
+            URL dynamicUrl = new URL("http://" + configReader.getServerAddress() + ":" + configReader.getDynamicServerPort() + url);
+            HttpURLConnection connection = (HttpURLConnection) dynamicUrl.openConnection();
+            connection.setRequestMethod(requestMethod);
+            connection.connect();
 
-        URL dynamicUrl = new URL("http://" + configReader.getServerAddress() + ":" + configReader.getDynamicServerPort() + url);
-        HttpURLConnection connection = (HttpURLConnection) dynamicUrl.openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
-        System.out.println("request sent");
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            writeResponse(new PrintWriter(socket.getOutputStream()), bufferedReader);
+        } catch (Exception e) {
 
-        System.out.println("content length=>" + connection.getContentLength());
-        System.out.println("response status=>" + connection.getResponseCode() );
-        System.out.println("response message=>" + connection.getResponseMessage());
-
-
-        System.out.println(new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine() + "<=response");
+        }
 
     }
 
@@ -73,16 +70,24 @@ public class WebServer {
         }
     }
 
-    private void sendResponse(String filePath) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream(filePath);
+    private void sendResponse(String file) throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(file);
         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+        PrintWriter printWriter = new PrintWriter(dataOutputStream);
+        writeResponse(printWriter, bufferedReader);
+    }
 
-        byte[] buffer = new byte[1024];
-        int bytes = 0;
+    private void writeResponse(PrintWriter printWriter, BufferedReader bufferedReader) throws IOException {
+        String line;
+        StringBuilder builder = new StringBuilder();
 
-        while ((bytes = fileInputStream.read(buffer)) != -1) {
-            dataOutputStream.write(buffer, 0, bytes);
+        while ((line = bufferedReader.readLine()) != null) {
+                builder.append(line);
         }
+
+        printWriter.print(builder.toString());
+        printWriter.flush();
     }
 
     String getFileName(String url) {
@@ -92,8 +97,10 @@ public class WebServer {
 
     private String getUrl() throws IOException {
         requestHeader = getRequestHeader();
+
         StringTokenizer stringTokenizer = new StringTokenizer(requestHeader.readLine());
-        stringTokenizer.nextToken();
+
+        requestMethod = stringTokenizer.nextToken();
         return stringTokenizer.nextToken();
     }
 
