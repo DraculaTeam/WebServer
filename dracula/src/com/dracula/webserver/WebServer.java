@@ -44,10 +44,8 @@ public class WebServer {
         HttpURLConnection connection = (HttpURLConnection) dynamicUrl.openConnection();
         connection.setRequestMethod(requestMethod);
         connection.connect();
-
         try {
             passExternalServerResponse(connection);
-
         } catch (Exception e) {
             e.getCause();
         }
@@ -89,16 +87,31 @@ public class WebServer {
     private void sendResponse(String file) throws IOException {
         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
         FileInputStream fileInputStream = new FileInputStream(file);
-        writeResponse(dataOutputStream, fileInputStream);
+        writeResponse(dataOutputStream, fileInputStream, file);
     }
 
-    private void writeResponse(DataOutputStream dataOutputStream, FileInputStream fileInputStream) throws IOException {
+    private int contentLength(FileInputStream fileInputStream) throws IOException {
+        byte[] buffer = new byte[1024];
+        int NoOfBytes=0,bytes;
+        while ((bytes = fileInputStream.read(buffer)) != -1) {
+            NoOfBytes = NoOfBytes+bytes;
+        }
+        return NoOfBytes;
+    }
+
+    private void writeResponse(DataOutputStream dataOutputStream, FileInputStream fileInputStream,String file) throws IOException {
         byte[] buffer = new byte[1024];
         int bytes = 0;
+        String fileExtension=file.substring(file.lastIndexOf('.')+1);
+        dataOutputStream.writeBytes("HTTP/1.1 200 OK\r\n");
+        dataOutputStream.writeBytes("version: HTTP/1.1\r\n");
+        dataOutputStream.writeBytes("server: dracula\r\n");
+        dataOutputStream.writeBytes("Content-Type:"+configReader.getContentType(fileExtension)+"\r\n\n");
 
         while ((bytes = fileInputStream.read(buffer)) != -1) {
             dataOutputStream.write(buffer, 0, bytes);
         }
+
     }
 
     String getFileName(String url) {

@@ -59,6 +59,11 @@ public class ConfigReaderTest {
         assertThat(configReader.getUrlPattern(PatternType.REVERSE_PROXY), IsEqual.equalTo("/forum/"));
     }
 
+    @Test
+    public void shouldGiveContentTypeOfJsFile() throws ParserConfigurationException, SAXException, IOException {
+        assertThat(configReader.getContentType("js"),IsEqual.equalTo("text/javascript"));
+    }
+
     private boolean matchElement() throws IOException, SAXException, ParserConfigurationException {
         Boolean result = true;
 

@@ -12,5 +12,14 @@
             <upstream-url>http://10.10.5.126</upstream-url>
             <port>8080</port>
         </dynamic-proxy-pass>
+
+        <content-type>
+            <js>text/javascript</js>
+            <css>text/css</css>
+            <html>text/html; charset=utf-8</html>
+            <gif>image/gif</gif>
+            <png>image/png</png>
+            <jpg>image/jpg</jpg>
+        </content-type>
     </http>
 </server-config>

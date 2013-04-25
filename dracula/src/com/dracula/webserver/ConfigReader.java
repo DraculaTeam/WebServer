@@ -63,7 +63,12 @@ public class ConfigReader {
         return type == PatternType.STATIC ? staticPattern : dynamicPattern;
     }
 
+    public String getContentType(String file) {
+        return document.getElementsByTagName(file).item(0).getTextContent();
+    }
+
     public int getDynamicServerPort() {
         return Integer.parseInt(document.getElementsByTagName("port").item(0).getTextContent());
     }
+
 }
