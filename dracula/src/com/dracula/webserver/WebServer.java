@@ -4,15 +4,18 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
-public class WebServer{
+public class WebServer {
     private ServerSocket serverSocket;
     private Socket socket;
     private ConfigReader configReader;
+    private BufferedReader requestHeader;
 
     public WebServer(ServerSocket socket, String configFile) throws ParserConfigurationException, SAXException, IOException {
         this.serverSocket = socket;
@@ -25,16 +28,32 @@ public class WebServer{
 
     public void handleRequest() throws IOException, ParserConfigurationException, SAXException {
         String url = getUrl();
+
         if (isStatic(url)) {
             handleStaticRequest(url);
         } else {
-            handleDynamicRequest( url);
+            handleDynamicRequest(url);
         }
 
         socket.close();
     }
 
     private void handleDynamicRequest(String url) throws IOException {
+        Socket externalServerSocket = new Socket(configReader.getServerAddress(), configReader.getDynamicServerPort());
+        System.out.println(externalServerSocket.getRemoteSocketAddress());
+
+        URL dynamicUrl = new URL("http://" + configReader.getServerAddress() + ":" + configReader.getDynamicServerPort() + url);
+        HttpURLConnection connection = (HttpURLConnection) dynamicUrl.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+        System.out.println("request sent");
+
+        System.out.println("content length=>" + connection.getContentLength());
+        System.out.println("response status=>" + connection.getResponseCode() );
+        System.out.println("response message=>" + connection.getResponseMessage());
+
+
+        System.out.println(new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine() + "<=response");
 
     }
 
@@ -72,10 +91,14 @@ public class WebServer{
     }
 
     private String getUrl() throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        StringTokenizer stringTokenizer = new StringTokenizer(bufferedReader.readLine());
+        requestHeader = getRequestHeader();
+        StringTokenizer stringTokenizer = new StringTokenizer(requestHeader.readLine());
         stringTokenizer.nextToken();
         return stringTokenizer.nextToken();
+    }
+
+    private BufferedReader getRequestHeader() throws IOException {
+        return new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
     private boolean isExtensionPresent(String url) throws IOException, SAXException, ParserConfigurationException {
