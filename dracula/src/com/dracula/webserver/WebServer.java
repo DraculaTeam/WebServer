@@ -90,12 +90,14 @@ public class WebServer {
         writeResponse(dataOutputStream, fileInputStream, file);
     }
 
-    private int contentLength(FileInputStream fileInputStream) throws IOException {
+    private int contentLength(String file) throws IOException {
         byte[] buffer = new byte[1024];
+        FileInputStream fileInputStream = new FileInputStream(file);
         int NoOfBytes=0,bytes;
         while ((bytes = fileInputStream.read(buffer)) != -1) {
             NoOfBytes = NoOfBytes+bytes;
         }
+        fileInputStream.close();
         return NoOfBytes;
     }
 
@@ -106,12 +108,13 @@ public class WebServer {
         dataOutputStream.writeBytes("HTTP/1.1 200 OK\r\n");
         dataOutputStream.writeBytes("version: HTTP/1.1\r\n");
         dataOutputStream.writeBytes("server: dracula\r\n");
-        dataOutputStream.writeBytes("Content-Type:"+configReader.getContentType(fileExtension)+"\r\n\n");
-
+        dataOutputStream.writeBytes("Content-Length:" + contentLength(file) + "\r\n");
+        dataOutputStream.writeBytes("Content-Type:" + configReader.getContentType(fileExtension) + "\r\n\n");
+        dataOutputStream.flush();
         while ((bytes = fileInputStream.read(buffer)) != -1) {
             dataOutputStream.write(buffer, 0, bytes);
         }
-
+        dataOutputStream.close();
     }
 
     String getFileName(String url) {
